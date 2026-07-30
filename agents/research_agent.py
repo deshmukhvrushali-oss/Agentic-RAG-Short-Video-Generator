@@ -1,40 +1,35 @@
-from utils.search import search_web
 from utils.openrouter_client import client
+from utils.chroma_db import store_documents, retrieve
+
 
 def research(topic):
 
-    search_result = search_web(topic)
-
-    context = ""
-
-    for item in search_result["results"]:
-        context += f"""
-Title: {item['title']}
-Content: {item['content']}
-Source: {item['url']}
-
-"""
+    old_data = retrieve(topic)
 
     prompt = f"""
-You are an AI Research Assistant.
-
-Using ONLY the information below, create a research summary.
-
 Topic:
 {topic}
 
-Information:
-{context}
+Previous Knowledge:
+{old_data}
 
-Give:
+Write a detailed research report.
 
-1. Introduction
-2. Latest Updates
-3. Important Facts
-4. Applications
-5. Future Scope
+Include:
 
-Write in simple English.
+Introduction
+
+Latest Information
+
+Applications
+
+Advantages
+
+Disadvantages
+
+Future Scope
+
+Conclusion
 """
 
     response = client.chat.completions.create(
@@ -44,8 +39,11 @@ Write in simple English.
                 "role": "user",
                 "content": prompt
             }
-        ],
-        max_tokens=900
+        ]
     )
 
-    return response.choices[0].message.content
+    text = response.choices[0].message.content
+
+    store_documents(topic, text)
+
+    return text
