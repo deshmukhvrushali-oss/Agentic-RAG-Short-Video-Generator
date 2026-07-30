@@ -1,4 +1,4 @@
-from agents.research_agent import ResearchAgent
+from agents.research_agent import research
 
 print("=" * 50)
 print("Agentic RAG Short Video Generator")
@@ -6,13 +6,11 @@ print("=" * 50)
 
 topic = input("Enter Topic: ")
 
-agent = ResearchAgent()
+result = research(topic)
 
-results = agent.search(topic)
+print("\n")
+print("=" * 50)
+print("RESEARCH REPORT")
+print("=" * 50)
 
-print("\nTop Search Results\n")
-
-for i, result in enumerate(results, start=1):
-    print(f"\n{i}. {result['title']}")
-    print(result["url"])
-    print(result["body"])
+print(result)
