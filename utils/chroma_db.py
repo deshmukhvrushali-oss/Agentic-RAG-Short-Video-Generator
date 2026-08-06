@@ -1,49 +1,8 @@
 import chromadb
-from sentence_transformers import SentenceTransformer
+import os
 
-client = chromadb.Client()
-
-collection = client.get_or_create_collection(
-    name="research_documents"
-)
-
-model = SentenceTransformer("all-MiniLM-L6-v2")
-
-
-def store_documents(search_results):
-
-    ids = []
-    docs = []
-
-    for i, item in enumerate(search_results["results"]):
-
-        ids.append(str(i))
-
-        docs.append(
-            f"""
-Title:
-{item['title']}
-
-Content:
-{item['content']}
-
-Source:
-{item['url']}
-"""
-        )
-
-    collection.add(
-        ids=ids,
-        documents=docs
-    )
-
-
-def retrieve(query):
-
-    result = collection.query(
-        query_texts=[query],
-        n_results=3
-    )import chromadb
+# Persistent database
+os.makedirs("data", exist_ok=True)
 
 client = chromadb.PersistentClient(path="data/chroma")
 
@@ -53,21 +12,34 @@ collection = client.get_or_create_collection(
 
 
 def store_documents(topic, content):
+    """
+    Store research in ChromaDB
+    """
+
+    try:
+        collection.delete(ids=[topic])
+    except:
+        pass
+
     collection.add(
-        documents=[content],
-        ids=[topic]
+        ids=[topic],
+        documents=[content]
     )
 
 
 def retrieve(topic):
+    """
+    Retrieve research from ChromaDB
+    """
+
     result = collection.query(
         query_texts=[topic],
         n_results=1
     )
 
-    if result["documents"]:
-        return result["documents"][0][0]
+    docs = result.get("documents", [])
+
+    if docs and len(docs[0]) > 0:
+        return docs[0][0]
 
     return ""
-
-    return result["documents"][0]

@@ -1,36 +1,40 @@
 from utils.openrouter_client import client
+from config import LLM_MODEL
 
 
 def plan(topic):
 
     prompt = f"""
-You are an AI Planner Agent.
+You are an expert YouTube Shorts content planner.
 
-Create a plan for generating a short educational video.
+Topic: {topic}
 
-Topic:
-{topic}
+Create a professional short video plan.
 
-Return the plan in this format:
+Return ONLY in this format.
 
-Topic:
-Video Type:
-Duration:
-Number of Scenes:
-Target Audience:
-Language:
-Voice Style:
+TITLE:
+INTRO:
+SCENE 1:
+SCENE 2:
+SCENE 3:
+SCENE 4:
+SCENE 5:
+OUTRO:
+
+Each scene should contain only 1-2 short sentences.
+
+Language: English.
 """
 
     response = client.chat.completions.create(
-        model="openai/gpt-oss-20b:free",
+        model=LLM_MODEL,
         messages=[
             {
                 "role": "user",
                 "content": prompt
             }
-        ],
-        max_tokens=300
+        ]
     )
 
     return response.choices[0].message.content

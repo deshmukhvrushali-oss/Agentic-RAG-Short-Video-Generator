@@ -24,11 +24,10 @@ os.makedirs("output", exist_ok=True)
 
 planner_output = plan(topic)
 
-print("\n")
-print("=" * 50)
-print("PLANNER AGENT")
-print("=" * 50)
+with open("output/plan.txt", "w", encoding="utf-8") as f:
+    f.write(planner_output)
 
+print("\nPlanner Agent Completed\n")
 print(planner_output)
 
 # ===========================
